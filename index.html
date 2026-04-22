@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rüzgar Otomotiv - Tüm marka ve modellerde orijinal çıkma yedek parça merkezi.">
+    <title>RÜZGAR OTOMOTİV | Ultimate Yedek Parça</title>
+    
+    <!-- Kaynaklar -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syncopate:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root {
+            --primary: #ff0000;
+            --primary-glow: rgba(255, 0, 0, 0.8);
+            --dark-bg: #000000;
+            --card-bg: #0a0a0a;
+            --accent: #1a1a1a;
+            --text-main: #ffffff;
+            --text-dim: #b0b0b0;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- STOK TARAMA EFEKTİ (SCANNER) --- */
+        #scanner-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 0, 0, 0.1);
+            z-index: 10001;
+            display: none;
+            pointer-events: none;
+        }
+        .scan-line {
+            width: 100%; height: 2px;
+            background: var(--primary);
+            position: absolute;
+            box-shadow: 0 0 20px var(--primary);
+            animation: scanMove 2s infinite linear;
+        }
+        @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* --- ÖZEL NAVBAR --- */
+        .navbar {
+            padding: 15px 0;
+            transition: 0.4s;
+            border-bottom: 1px solid transparent;
+        }
+        .navbar.scrolled {
+            background: rgba(0,0,0,0.9);
+            border-bottom: 1px solid var(--primary);
+            backdrop-filter: blur(10px);
+        }
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: var(--primary) !important;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, #000 30%, transparent), 
+                        url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(2rem, 8vw, 6rem);
+            font-weight: 700;
+            line-height: 0.9;
+            text-transform: uppercase;
+        }
+        .hero-title span { color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
+
+        /* --- SAHİBİNDEN MAĞAZA ÖZEL --- */
+        .sahibinden-card {
+            background: #ffdb4d; /* Sahibinden sarısı */
+            color: #000;
+            padding: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.3s;
+            text-decoration: none;
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+        .sahibinden-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 219, 77, 0.3); color: #000; }
+
+        /* --- ÜRÜN KARTLARI --- */
+        .card-custom {
+            background: var(--card-bg);
+            border: 1px solid #1a1a1a;
+            height: 100%;
+            transition: 0.4s;
+        }
+        .card-custom:hover { border-color: var(--primary); transform: scale(1.02); }
+        .img-box {
+            height: 250px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+        .img-box img { width: 100%; height: 100%; object-fit: contain; transition: 0.5s; }
+        .card-custom:hover .img-box img { transform: scale(1.1); }
+        
+        .stock-status {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: #00ff00;
+            color: #000;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        /* --- BUTONLAR --- */
+        .btn-main {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 15px 35px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            transition: 0.3s;
+        }
+        .btn-main:hover { background: #fff; color: #000; transform: skewX(-5deg); }
+
+        .btn-outline {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+        .btn-outline:hover { background: var(--primary); color: #fff; }
+
+        /* --- MARKA LOGOLARI --- */
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            opacity: 0.6;
+        }
+        .brand-item {
+            border: 1px solid #222;
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* --- FOOTER & CONTACT --- */
+        .footer-dark {
+            background: #050505;
+            padding: 80px 0 40px;
+            border-top: 1px solid #111;
+        }
+
+        /* --- ANIMASYONLAR --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s all ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Stok Tarama Overlay -->
+    <div id="scanner-overlay">
+        <div class="scan-line"></div>
+        <div class="d-flex align-items-center justify-content-center h-100">
+            <h1 class="font-orbitron text-primary animate__animated animate__pulse animate__infinite">VERİLER TARANIYOR...</h1>
+        </div>
+    </div>
+
+    <!-- Menü -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">RÜZGAR<span class="text-white">AUTO</span></a>
+            <div class="d-flex align-items-center ms-auto">
+                <a href="tel:+905320000000" class="btn btn-outline d-none d-md-inline-block me-3">HIZLI ARA</a>
+                <button class="btn btn-main" onclick="patlatStoklari()">STOKLARI PATLAT</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="text-primary fw-bold tracking-widest mb-3">#1 YEDEK PARÇA MERKEZİ</h5>
+                    <h1 class="hero-title animate__animated animate__fadeInUp">HER MARKA <br><span>HER MODEL</span> <br>TEK ADRES.</h1>
+                    <p class="lead text-dim mt-4 mb-5">Türkiye'nin en büyük çıkma parça stoğu. Peugeot, Ford, Fiat, BMW ve tüm dünya markaları orijinal kondisyonda sizi bekliyor.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sahibinden Mağazası Şeridi -->
+    <div class="container">
+        <a href="https://ruzgarotomotiv.sahibinden.com" target="_blank" class="sahibinden-card animate__animated animate__fadeInUp">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-shopping-bag fs-1 me-4"></i>
+                <div>
+                    <h3 class="m-0 fw-bold">SAHİBİNDEN MAĞAZAMIZ</h3>
+                    <p class="m-0 small">Tüm güncel ilanlarımızı incelemek için tıklayın.</p>
+                </div>
+            </div>
+            <div class="d-none d-md-block">
+                <span class="btn btn-dark rounded-pill px-4 fw-bold">MAĞAZAYA GİT <i class="fas fa-arrow-right ms-2"></i></span>
+            </div>
+        </a>
+    </div>
+
+    <!-- Ürünler Bölümü -->
+    <section class="py-5 mt-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-5 reveal">
+                <div>
+                    <h6 class="text-primary fw-bold">POPÜLER ÜRÜNLER</h6>
+                    <h2 class="display-5 font-orbitron fw-black m-0">GÜNCEL STOK</h2>
+                </div>
+                <div class="d-none d-md-block">
+                    <p class="text-dim small text-end">Anlık güncellenen<br>parça listesi.</p>
+                </div>
+            </div>
+
+            <div class="row g-4" id="stok-container">
+                <!-- Parça 1 -->
+                <div class="col-md-4 reveal">
+                    <div class="card-custom">
+                        <div class="img-box">
+                            <span class="stock-status">STOKTA</span>
+                            <img src="https://image5.sahibinden.com/photos/25/06/85/13082506856j6.jpg" onerror="this.src=''" alt="Peugeot 301">
+                        </div>
+                        <div class="p-4">
+                            <h4 class="fw-bold m-0">PEUGEOT 301 KAPI</h4>
+                            <p class="text-dim small mt-2">Sol Arka - Boyasız Çıkma</p>
+                            <div class="mt-4 d-flex gap-2">
+                                <a href="https://wa.me/905320000000" class="btn btn-outline w-100"><i class="fab fa-whatsapp me-2"></i>BİLGİ AL</a>
+                                <a href="https://www.sahibinden.com/ilan/yedek-parca-aksesuar-donanim-tuning-otomotiv-ekipmanlari-yedek-parca-peugeot-301-sol-arka-kapi-1308250685/detay" class="btn btn-dark w-100">İLAN</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parça 2 -->
+                <div class="col-md-4 reveal">
+                    <div class="card-custom">
+                        <div class="img-box">
+                            <span class="stock-status">STOKTA</span>
+                            <img src="https://image5.sahibinden.com/photos/51/26/83/1295126833g0k.jpg" onerror="this.src=''" alt="Focus 3">
+                        </div>
+                        <div class="p-4">
+                            <h4 class="fw-bold m-0">FOCUS 3 ÇAMURLUK</h4>
+                            <p class="text-dim small mt-2">Sağ Arka - Kesme Orijinal</p>
+                            <div class="mt-4 d-flex gap-2">
+                                <a href="https://wa.me/905320000000" class="btn btn-outline w-100"><i class="fab fa-whatsapp me-2"></i>BİLGİ AL</a>
+                                <a href="https://www.sahibinden.com/ilan/yedek-parca-aksesuar-donanim-tuning-otomotiv-ekipmanlari-yedek-parca-focus-3-sag-arka-camurluk-1295126833/detay" class="btn btn-dark w-100">İLAN</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parça 3 -->
+                <div class="col-md-4 reveal">
+                    <div class="card-custom">
+                        <div class="img-box">
+                            <span class="stock-status">STOKTA</span>
+                            <img src="https://image5.sahibinden.com/photos/32/98/85/1304329885h7x.jpg" onerror="this.src=''" alt="Doblo 3">
+                        </div>
+                        <div class="p-4">
+                            <h4 class="fw-bold m-0">FIAT DOBLO TAVAN</h4>
+                            <p class="text-dim small mt-2">Doblo 3 - Hatasız Kesme</p>
+                            <div class="mt-4 d-flex gap-2">
+                                <a href="https://wa.me/905320000000" class="btn btn-outline w-100"><i class="fab fa-whatsapp me-2"></i>BİLGİ AL</a>
+                                <a href="https://www.sahibinden.com/ilan/yedek-parca-aksesuar-donanim-tuning-otomotiv-ekipmanlari-yedek-parca-fiat-doblo-3-kesme-tavan-1304329885/detay" class="btn btn-dark w-100">İLAN</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bütün Markalar & Araştır Bölümü -->
+    <section class="py-5 bg-accent">
+        <div class="container py-5 text-center reveal">
+            <h2 class="display-6 fw-bold mb-5 font-orbitron">HER MARKA <span class="text-primary">ARAŞTIRILIR</span></h2>
+            <div class="brand-grid mb-5">
+                <div class="brand-item">BMW</div>
+                <div class="brand-item">MERCEDES</div>
+                <div class="brand-item">AUDI</div>
+                <div class="brand-item">TOYOTA</div>
+                <div class="brand-item">VOLVO</div>
+                <div class="brand-item">HYUNDAI</div>
+                <div class="brand-item">KIA</div>
+                <div class="brand-item">OPEL</div>
+            </div>
+            <p class="text-dim mb-5">Listede göremediğiniz parçaları ekibimiz sizin için en kısa sürede araştırır ve tedarik eder.</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="p-4 border border-secondary">
+                        <h4 class="mb-4">İHTİYACINI EKLE</h4>
+                        <input type="text" class="form-control bg-transparent text-white border-secondary rounded-0 mb-3" placeholder="Marka / Model">
+                        <input type="text" class="form-control bg-transparent text-white border-secondary rounded-0 mb-3" placeholder="Aradığınız Parça">
+                        <button class="btn btn-main w-100">ARAŞTIRMA TALEBİ GÖNDER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- İletişim Footer -->
+    <footer class="footer-dark">
+        <div class="container">
+            <div class="row gy-5">
+                <div class="col-lg-4">
+                    <h2 class="navbar-brand">RÜZGAR AUTO</h2>
+                    <p class="text-dim mt-4">Sektördeki 20 yıllık tecrübemizle, tüm araç gruplarında garantili parça desteği sunuyoruz.</p>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <h5 class="fw-bold text-primary mb-4">HIZLI ERİŞİM</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-dim text-decoration-none hover-white">Anasayfa</a></li>
+                        <li class="mb-2"><a href="#stok-container" class="text-dim text-decoration-none hover-white">Stoklar</a></li>
+                        <li class="mb-2"><a href="https://ruzgarotomotiv.sahibinden.com" class="text-dim text-decoration-none hover-white">Sahibinden Mağaza</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <h5 class="fw-bold text-primary mb-4">KONUM</h5>
+                    <p class="text-dim">Oto Sanayi Sitesi, 1. Sokak<br>No: 15 / KONYA</p>
+                    <div class="mt-4">
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-whatsapp fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5 pt-4 border-top border-secondary opacity-50">
+                <small>&copy; 2024 RÜZGAR OTOMOTİV - YEDEK PARÇADA EFSANE HIZ.</small>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+
+            // Scroll Reveal
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+                    el.classList.add('active');
+                }
+            });
+        });
+
+        // "Stokları Patlat" Fonksiyonu (Yenileme Yerine Animasyon)
+        function patlatStoklari() {
+            const scanner = document.getElementById('scanner-overlay');
+            scanner.style.display = 'block';
+            
+            // Konfeti veya sarsıntı efekti eklenebilir
+            document.body.style.animation = 'shake 0.5s';
+            
+            setTimeout(() => {
+                scanner.style.display = 'none';
+                document.body.style.animation = '';
+                
+                // Başarı mesajı (isteğe bağlı)
+                const toast = document.createElement('div');
+                toast.style = "position:fixed; bottom:20px; right:20px; background:#ff0000; color:#fff; padding:15px 30px; z-index:10002; font-weight:900; font-family:'Orbitron'; border:2px solid #fff;";
+                toast.innerText = "SİSTEM TARANDI: 450+ YENİ PARÇA BULUNDU!";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }, 2000);
+        }
+    </script>
+
+    <style>
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .hover-white:hover { color: #fff !important; }
+    </style>
+
+</body>
+</html>
