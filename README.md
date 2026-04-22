@@ -1,1 +1,1 @@
-rğüzgar oto
+sayın otomativ 
